@@ -1,0 +1,8 @@
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.csprojResolveAssemblyReference.cache
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.Service1.resources
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.csproj.GenerateResource.Cache
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\bin\Debug\ImageService.exe.config
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\bin\Debug\ImageService.exe
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\bin\Debug\ImageService.pdb
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.exe
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.pdb

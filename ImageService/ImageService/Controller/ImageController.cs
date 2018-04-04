@@ -20,19 +20,17 @@ namespace ImageService.Controller
             m_modal = modal;                    // Storing the Modal Of The System
             commands = new Dictionary<int, ICommand>()
             {
-                { 1, new NewFileCommand(m_modal) }
+                { 1, new NewFileCommand(m_modal) },
+                { 3, new DeleteFileCommand(m_modal)}
 				// For Now will contain NEW_FILE_COMMAND
             };
         }
         public string ExecuteCommand(int commandID, string[] args, out bool resultSuccesful)
         {
-            switch (commandID) {
-                case 1:
-                    return commands[1].Execute(args, out resultSuccesful);
-                default:
-                    resultSuccesful = false;
-                    return "No Executoion";
-                    }
+            if (commands.ContainsKey(commandID))
+                return commands[1].Execute(args, out resultSuccesful);
+            resultSuccesful = false;
+            return ".";
         }
     }
 }

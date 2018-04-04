@@ -11,6 +11,7 @@ namespace ImageService.Commands
     public class NewFileCommand : ICommand
     {
         private IImageServiceModal m_modal;
+        private string file_path;
 
         public NewFileCommand(IImageServiceModal modal)
         {

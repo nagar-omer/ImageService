@@ -15,6 +15,7 @@ using System.Diagnostics;
 
 namespace ImageService.Controller.Handlers
 {
+    enum COMMAND { NEW=1, RENAME, DELETE};
     // this class is responsible for the directory that is being watched 
     // - it contains a filewatcher that alerts it if chanches have been made to this directory
     // - its asosiated to the commands executed in the server
@@ -58,7 +59,8 @@ namespace ImageService.Controller.Handlers
         private void BuildLogger(ILoggingService logger) {
             m_logging = logger;
             // TODO:    set logger path
-            DirHanlerLogeer = new System.Diagnostics.EventLog();
+            DirHanlerLogeer = new System.Diagnostics.EventLog("Application");
+            DirHanlerLogeer.Source = "Application";
             m_logging.MessageRecieved += this.LogHandler;
         }
 
@@ -84,7 +86,7 @@ namespace ImageService.Controller.Handlers
 
         // building fileWatcher
         private void FileWatcherBuild() {
-            var m_dirWatcher = new FileSystemWatcher(m_path);
+            m_dirWatcher = new FileSystemWatcher(m_path);
             // list of types to watch 
             m_dirWatcher.Filter = "*";
             filters = new string[] { ".jpg", ".png", ".gif", ".bmp" };
@@ -103,13 +105,27 @@ namespace ImageService.Controller.Handlers
 
         private void HandlerChanged(object sender, FileSystemEventArgs args) {
             if (filters.Contains(Path.GetExtension(args.FullPath))) {
-                // file changed logic
+                m_logging.Log("HandlerChanged", MessageTypeEnum.INFO);
             }
         }
 
         private void HandlerCreated(object sender, FileSystemEventArgs args) {
             // check type is matching to .jpg/.png.....
             if (filters.Contains(Path.GetExtension(args.FullPath))) {
+                m_logging.Log("HandlerCreated", MessageTypeEnum.INFO);
+                // indication var
+                bool result;
+                // args - full path of created file 
+                string[] argsForCommand = new string[1];
+                argsForCommand[0] = args.FullPath;
+                // activate command {1: NewFileCommand}, with args of the file that was created
+                m_controller.ExecuteCommand(1, argsForCommand, out result);
+            }
+        }
+
+        private void HandlerDeleated(object sender, FileSystemEventArgs args) {
+            if (filters.Contains(Path.GetExtension(args.FullPath))) {
+                m_logging.Log("HandlerDeleated", MessageTypeEnum.INFO);
                 // indication var
                 bool result;
                 // args - full path of created file 
@@ -117,19 +133,13 @@ namespace ImageService.Controller.Handlers
                 argsForCommand[0] = args.FullPath;
                 // activate command {1: NewFileCommand}, with args of the file that was created
                 // TODO:    create Enum to replace 1
-                m_controller.ExecuteCommand(1, argsForCommand, out result);
-            }
-        }
-
-        private void HandlerDeleated(object sender, FileSystemEventArgs args) {
-            if (filters.Contains(Path.GetExtension(args.FullPath))) {
-                // file deleted logic
+                m_controller.ExecuteCommand(3, argsForCommand, out result);
             }
         }
 
         private void HandlerRenamed(object sender, FileSystemEventArgs args) {
             if (filters.Contains(Path.GetExtension(args.FullPath))) {
-                // file renamed logic
+                m_logging.Log("HandlerRenamed", MessageTypeEnum.INFO);
             }
         }
     }

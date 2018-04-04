@@ -32,13 +32,8 @@ namespace ImageService.Server
             CommandRecieved(this, args);
         }
 
-        // server constructor
-        public ImageServer(string outDir ,ILoggingService logger, int thumbSize = 40) {
-            m_logging = logger;
-            // service modal - responsible for managing output_dir for sorted images
-            m_service = new ImageServiceModal(outDir, thumbSize);
-
-            // TODO:    init h_handler
+        public void watch_dir(string path_dir_to_watch) {
+            // TODO:    init m_handler
             // we should be able to watch mor then one directory, so this should actualy be a list
             // acordingly we will need to have list of handlers
 
@@ -50,15 +45,21 @@ namespace ImageService.Server
             //toWatch[@""].StartHandleDirectory(@"");
             //CommandRecieved += toWatch[@""].OnCommandRecieved;
 
-
-            string dir_path_to_watch = @"";
             m_handler = new DirectoyHandler(m_service, m_logging);
-            m_handler.StartHandleDirectory(dir_path_to_watch);
+            m_handler.StartHandleDirectory(path_dir_to_watch);
             CommandRecieved += m_handler.OnCommandRecieved;
+        }
+
+        // server constructor
+        public ImageServer(string outDir ,ILoggingService logger, int thumbSize = 40) {
+            m_logging = logger;
+            // service modal - responsible for managing output_dir for sorted images
+            m_service = new ImageServiceModal(outDir, thumbSize, logger);
 
 
             // TODO:    set logger path
-            ServerLogger = new System.Diagnostics.EventLog();
+            ServerLogger = new System.Diagnostics.EventLog("Application");
+            ServerLogger.Source = "Application";
             m_logging.MessageRecieved += this.LogHandler;
             m_logging.Log("server constructor finished" , MessageTypeEnum.INFO);
         }
