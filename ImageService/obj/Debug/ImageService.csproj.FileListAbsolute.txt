@@ -6,3 +6,4 @@ C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService
 C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\bin\Debug\ImageService.pdb
 C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.exe
 C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.pdb
+C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.ProjectInstaller.resources

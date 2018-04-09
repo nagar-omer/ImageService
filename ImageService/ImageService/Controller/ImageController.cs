@@ -28,7 +28,7 @@ namespace ImageService.Controller
         public string ExecuteCommand(int commandID, string[] args, out bool resultSuccesful)
         {
             if (commands.ContainsKey(commandID))
-                return commands[1].Execute(args, out resultSuccesful);
+                return commands[commandID].Execute(args, out resultSuccesful);
             resultSuccesful = false;
             return ".";
         }

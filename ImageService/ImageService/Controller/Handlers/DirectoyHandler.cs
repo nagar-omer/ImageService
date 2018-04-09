@@ -139,6 +139,8 @@ namespace ImageService.Controller.Handlers
 
         private void HandlerRenamed(object sender, FileSystemEventArgs args) {
             if (filters.Contains(Path.GetExtension(args.FullPath))) {
+                var a = args.Name;
+                var b = args.FullPath;
                 m_logging.Log("HandlerRenamed", MessageTypeEnum.INFO);
             }
         }

@@ -22,12 +22,14 @@ namespace ImageService.Modal
         private int m_thumbnailSize;
         private DateTime defaultTime;
         private ILoggingService m_loggin;
+        Dictionary<string, DateTime> watched;
         private Regex r = new Regex(":");
         // The Size Of The Thumbnail Size
         #endregion
 
         // constructor 
         public ImageServiceModal(string outDir, int thumbSize, ILoggingService logger) {
+            watched = new Dictionary<string, DateTime>();
             m_OutputFolder = outDir;
             m_TumbFolder = Path.Combine(outDir, "Thumbnail");
             defaultTime = new DateTime(2000, 1, 1);
@@ -79,15 +81,20 @@ namespace ImageService.Modal
             m_loggin.Log("new file - image service" + path, Logging.Modal.MessageTypeEnum.INFO);
             try {
                 var date = GetDateTakenFromImage(path);
+                watched.Add(path, date);
                 create_path(date.Year.ToString(), date.Month.ToString());
                 // copy to sorted folders
                 string dest_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
                 File.Copy(path, dest_path, true);
                 // create Tumbnail and save it to thmbnail dir
                 string tumb_path = Path.Combine(m_TumbFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
-                Image image = Image.FromFile(path);
-                Image thumb = image.GetThumbnailImage(m_thumbnailSize, m_thumbnailSize, () => false, IntPtr.Zero);
-                thumb.Save(tumb_path);
+
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                using (var myImage = Image.FromStream(fs, false, false)) {
+                    //Image image = Image.FromFile(path);
+                    Image thumb = myImage.GetThumbnailImage(m_thumbnailSize, m_thumbnailSize, () => false, IntPtr.Zero);
+                    thumb.Save(tumb_path);
+                }
                 // return success
                 result = true;
                 return dest_path;
@@ -120,7 +127,8 @@ namespace ImageService.Modal
         // delete file from sorted and from thumbnails
         public string DeleteFile(string path, out bool result) {
             m_loggin.Log("delete file - image service" + path, Logging.Modal.MessageTypeEnum.INFO);
-            var date = GetDateTakenFromImage(path);
+            var date = watched[path];
+            watched.Remove(path);
             string sort_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
             string tumb_path = Path.Combine(m_TumbFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
             result = true;

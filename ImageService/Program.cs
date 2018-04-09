@@ -11,18 +11,18 @@ namespace ImageService {
         /// The main entry point for the application.
         /// </summary>
         static void Main() {
-#if DEBUG
-            var debug = new Service1();
-            debug.OnDebug();
-            System.Threading.Thread.Sleep(System.Threading.Timeout.Infinite);
-#else
+//#if debug
+//            var debug = new service1();
+//            debug.ondebug();
+//            system.threading.thread.sleep(system.threading.timeout.infinite);
+//#else
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
                 new Service1()
             };
             ServiceBase.Run(ServicesToRun);
-#endif
+//#endif
         }
     }
 }

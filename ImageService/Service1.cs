@@ -9,6 +9,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace ImageService {
     public partial class Service1 : ServiceBase {
@@ -22,10 +23,18 @@ namespace ImageService {
             OnStart(null);
         }
         protected override void OnStart(string[] args) {
-            outdir_path = "output";
+            int thumbSize = Int32.Parse(ConfigurationManager.AppSettings["ThumbnailSize"]);
+            outdir_path = ConfigurationManager.AppSettings["OutputDir"];
             var logger = new LoggingService();
-            var server = new ImageServer(outdir_path, logger);
-            server.watch_dir("to_watch");
+            var server = new ImageServer(outdir_path, logger, thumbSize);
+
+            int numFolders = Int32.Parse(ConfigurationManager.AppSettings["NumFoldersToWatch"]);
+            for(int i = 1; i<= numFolders; i++)
+                server.watch_dir(ConfigurationManager.AppSettings["Handler_" + i]);
+            
+            
+            
+            
         }
 
         protected override void OnStop() {
