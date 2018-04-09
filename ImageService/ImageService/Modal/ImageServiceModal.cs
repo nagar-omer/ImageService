@@ -126,6 +126,8 @@ namespace ImageService.Modal
 
         // delete file from sorted and from thumbnails
         public string DeleteFile(string path, out bool result) {
+            // TODO: fix delete - somthing is obtaining the files and they cant be deleted
+            // maybe its a problem in GetDate func
             m_loggin.Log("delete file - image service" + path, Logging.Modal.MessageTypeEnum.INFO);
             var date = watched[path];
             watched.Remove(path);
