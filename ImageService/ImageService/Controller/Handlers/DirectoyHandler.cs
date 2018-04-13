@@ -116,8 +116,9 @@ namespace ImageService.Controller.Handlers
                 // indication var
                 bool result;
                 // args - full path of created file 
-                string[] argsForCommand = new string[1];
+                string[] argsForCommand = new string[2];
                 argsForCommand[0] = args.FullPath;
+                argsForCommand[1] = args.Name;
                 // activate command {1: NewFileCommand}, with args of the file that was created
                 m_controller.ExecuteCommand(1, argsForCommand, out result);
             }

@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 
 // controls OutputDir
@@ -23,24 +24,70 @@ namespace ImageService.Modal
         private DateTime defaultTime;
         private ILoggingService m_loggin;
         Dictionary<string, DateTime> watched;
+        private string watche_file_name = "watched.xml";
         private Regex r = new Regex(":");
         // The Size Of The Thumbnail Size
         #endregion
 
         // constructor 
         public ImageServiceModal(string outDir, int thumbSize, ILoggingService logger) {
-            watched = new Dictionary<string, DateTime>();
             m_OutputFolder = outDir;
             m_TumbFolder = Path.Combine(outDir, "Thumbnail");
+            watched = new Dictionary<string, DateTime>();
             defaultTime = new DateTime(2000, 1, 1);
             m_thumbnailSize = thumbSize;
             m_loggin = logger;
         }
-        
+
+        private void Copy(string source, string target) {
+            using (var inputFile = new FileStream(
+         source,
+         FileMode.Open,
+         FileAccess.Read,
+         FileShare.ReadWrite)) {
+                using (var outputFile = new FileStream(target, FileMode.Create)) {
+                    var buffer = new byte[0x10000];
+                    int bytes;
+
+                    while ((bytes = inputFile.Read(buffer, 0, buffer.Length)) > 0) {
+                        outputFile.Write(buffer, 0, bytes);
+                    }
+                }
+            }
+        }
+
+        private bool IsFileLocked(string path) {
+            FileStream stream = null;
+            var file = new FileInfo(path);
+            try {
+                stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            }
+            catch (IOException) {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return true;
+            }
+            finally {
+                if (stream != null)
+                    stream.Close();
+            }
+
+            //file is not locked
+            return false;
+        }
+
+        private void wait_until_unlocked(string path) {
+            for (int i = 0; i < 100; i++)
+                if (IsFileLocked(path))
+                    System.Threading.Thread.Sleep(1000);
+        }
+
         //retrieves the datetime WITHOUT loading the whole image
         private DateTime GetDateTakenFromImage(string path) {
             m_loggin.Log("get time - image service" + path, Logging.Modal.MessageTypeEnum.INFO);
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var myImage = Image.FromStream(fs, false, false)) {
                 PropertyItem propItem;
                 // try getting taken date time
@@ -48,12 +95,14 @@ namespace ImageService.Modal
                     propItem = myImage.GetPropertyItem(36867);
                 }
                 catch (Exception e1) {
+                    m_loggin.Log("GetDateTakenFromImage_1: " + e1.Message + path, Logging.Modal.MessageTypeEnum.INFO);
                     // try getting last modified
                     try {
                         propItem = myImage.GetPropertyItem(306);
                     }
                     // if non of the above exist return current time
                     catch(Exception e2) {
+                        m_loggin.Log("GetDateTakenFromImage_2: " + e2.Message + path, Logging.Modal.MessageTypeEnum.INFO);
                         return defaultTime;
                     }
                 }
@@ -77,15 +126,21 @@ namespace ImageService.Modal
             CreateFolder(Path.Combine(m_TumbFolder, year, month));
         }
 
-        public string AddFile(string path, out bool result) {
+        public string AddFile(string path, string file_name, out bool result) {
             m_loggin.Log("new file - image service" + path, Logging.Modal.MessageTypeEnum.INFO);
             try {
+                // wait for file to be unlocked
+                wait_until_unlocked(path);
                 var date = GetDateTakenFromImage(path);
                 watched.Add(path, date);
                 create_path(date.Year.ToString(), date.Month.ToString());
                 // copy to sorted folders
-                string dest_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
-                File.Copy(path, dest_path, true);
+                string dest_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), file_name);
+                m_loggin.Log("copy from:" + path + " to: " + dest_path , Logging.Modal.MessageTypeEnum.INFO);
+
+                //File.Copy(path, dest_path, false);
+                Copy(path, dest_path);
+                
                 // create Tumbnail and save it to thmbnail dir
                 string tumb_path = Path.Combine(m_TumbFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
 
@@ -101,6 +156,7 @@ namespace ImageService.Modal
             }
             catch(Exception e) {
                 // return fail
+                m_loggin.Log("AddFile: " + e.Message, Logging.Modal.MessageTypeEnum.INFO);
                 result = false;
                 return "";
             }
@@ -126,8 +182,6 @@ namespace ImageService.Modal
 
         // delete file from sorted and from thumbnails
         public string DeleteFile(string path, out bool result) {
-            // TODO: fix delete - somthing is obtaining the files and they cant be deleted
-            // maybe its a problem in GetDate func
             m_loggin.Log("delete file - image service" + path, Logging.Modal.MessageTypeEnum.INFO);
             var date = watched[path];
             watched.Remove(path);
@@ -136,16 +190,24 @@ namespace ImageService.Modal
             result = true;
             // delete from sorted
             try {
-                File.Delete(sort_path);
+                if (File.Exists(sort_path)) {
+                    wait_until_unlocked(sort_path);
+                    File.Delete(sort_path);
+                }
             }
             catch(Exception e) {
+                m_loggin.Log("deleteFile_1: " + e.Message + path, Logging.Modal.MessageTypeEnum.INFO);
                 result = false;
             }
             // delete from tumbnails
             try {
-                File.Delete(tumb_path);
+                if (File.Exists(sort_path)) {
+                    wait_until_unlocked(tumb_path);
+                    File.Delete(tumb_path);
+                }
             }
             catch (Exception e) {
+                m_loggin.Log("deleteFile_2: " + e.Message + path, Logging.Modal.MessageTypeEnum.INFO);
                 result = false;
             }
 
@@ -169,8 +231,11 @@ namespace ImageService.Modal
         // delete folder only if its Empty!!
         private void DeleteFolder(string path) {
             // if directory is empty
-            if (!Directory.EnumerateFileSystemEntries(path).Any())
-                Directory.Delete(path);
+            if (File.Exists(path)) {
+                wait_until_unlocked(path);
+                if (!Directory.EnumerateFileSystemEntries(path).Any())
+                    Directory.Delete(path);
+            }
         }
     }
 }

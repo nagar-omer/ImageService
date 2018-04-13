@@ -32,9 +32,6 @@ namespace ImageService {
             for(int i = 1; i<= numFolders; i++)
                 server.watch_dir(ConfigurationManager.AppSettings["Handler_" + i]);
             
-            
-            
-            
         }
 
         protected override void OnStop() {
