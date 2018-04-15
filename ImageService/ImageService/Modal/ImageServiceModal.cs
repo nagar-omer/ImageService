@@ -23,7 +23,7 @@ namespace ImageService.Modal
         private int m_thumbnailSize;
         private DateTime defaultTime;
         private ILoggingService m_loggin;
-        Dictionary<string, DateTime> watched;
+        Dictionary<string, FileOutInfo> watched;
         private string watche_file_name = "watched.xml";
         private Regex r = new Regex(":");
         // The Size Of The Thumbnail Size
@@ -33,7 +33,7 @@ namespace ImageService.Modal
         public ImageServiceModal(string outDir, int thumbSize, ILoggingService logger) {
             m_OutputFolder = outDir;
             m_TumbFolder = Path.Combine(outDir, "Thumbnail");
-            watched = new Dictionary<string, DateTime>();
+            watched = new Dictionary<string, FileOutInfo>();
             defaultTime = new DateTime(2000, 1, 1);
             m_thumbnailSize = thumbSize;
             m_loggin = logger;
@@ -126,23 +126,52 @@ namespace ImageService.Modal
             CreateFolder(Path.Combine(m_TumbFolder, year, month));
         }
 
+        private void addToWatched(string path, string file_name,  out string sort_path, out string thumb_path) {
+            var date = GetDateTakenFromImage(path);
+            create_path(date.Year.ToString(), date.Month.ToString());
+
+            sort_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), file_name);
+
+            if (File.Exists(sort_path)) {
+                var has_name = false;
+                int i = 0;
+                while (!has_name) {
+                    sort_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), i + "_" + file_name);
+                    if (!File.Exists(sort_path)) {
+                        has_name = true;
+                        break;
+                    }
+                    i++;
+                }
+                
+            }
+              
+            // create Tumbnail and save it to thmbnail dir
+            thumb_path = Path.Combine(m_TumbFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(sort_path));
+            watched.Add(path, new FileOutInfo());
+            watched[path].Time = date;
+            watched[path].Name = Path.GetFileName(sort_path);
+        }
+
+        public DateTime removeFromWatched(string path, out string sort_path, out string thumb_path) {
+            var date = watched[path].Time;
+            var file_name = watched[path].Name;
+            sort_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), file_name);
+            thumb_path = Path.Combine(m_TumbFolder, date.Year.ToString(), date.Month.ToString(), file_name);
+            watched.Remove(path);
+            return date;
+        }
         public string AddFile(string path, string file_name, out bool result) {
             m_loggin.Log("new file - image service" + path, Logging.Modal.MessageTypeEnum.INFO);
             try {
                 // wait for file to be unlocked
                 wait_until_unlocked(path);
-                var date = GetDateTakenFromImage(path);
-                watched.Add(path, date);
-                create_path(date.Year.ToString(), date.Month.ToString());
-                // copy to sorted folders
-                string dest_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), file_name);
+                string dest_path, tumb_path;
+                addToWatched(path, file_name, out dest_path, out tumb_path);
                 m_loggin.Log("copy from:" + path + " to: " + dest_path , Logging.Modal.MessageTypeEnum.INFO);
 
                 //File.Copy(path, dest_path, false);
-                Copy(path, dest_path);
-                
-                // create Tumbnail and save it to thmbnail dir
-                string tumb_path = Path.Combine(m_TumbFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
+                Copy(path, dest_path); 
 
                 using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                 using (var myImage = Image.FromStream(fs, false, false)) {
@@ -183,10 +212,8 @@ namespace ImageService.Modal
         // delete file from sorted and from thumbnails
         public string DeleteFile(string path, out bool result) {
             m_loggin.Log("delete file - image service" + path, Logging.Modal.MessageTypeEnum.INFO);
-            var date = watched[path];
-            watched.Remove(path);
-            string sort_path = Path.Combine(m_OutputFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
-            string tumb_path = Path.Combine(m_TumbFolder, date.Year.ToString(), date.Month.ToString(), Path.GetFileName(path));
+            string sort_path, tumb_path;
+            var date = removeFromWatched(path, out sort_path, out tumb_path);
             result = true;
             // delete from sorted
             try {
@@ -201,7 +228,7 @@ namespace ImageService.Modal
             }
             // delete from tumbnails
             try {
-                if (File.Exists(sort_path)) {
+                if (File.Exists(tumb_path)) {
                     wait_until_unlocked(tumb_path);
                     File.Delete(tumb_path);
                 }
@@ -231,10 +258,8 @@ namespace ImageService.Modal
         // delete folder only if its Empty!!
         private void DeleteFolder(string path) {
             // if directory is empty
-            if (File.Exists(path)) {
-                wait_until_unlocked(path);
-                if (!Directory.EnumerateFileSystemEntries(path).Any())
-                    Directory.Delete(path);
+            if (!Directory.EnumerateFileSystemEntries(path).Any()) {
+                Directory.Delete(path);
             }
         }
     }

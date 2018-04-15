@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="ImageService\Modal\Event\CommandRecievedEventArgs.cs" />
     <Compile Include="ImageService\Modal\Event\DirectoryCloseEventArgs.cs" />
+    <Compile Include="ImageService\Modal\FileOutInfo.cs" />
     <Compile Include="ImageService\Modal\IImageServiceModal.cs" />
     <Compile Include="ImageService\Modal\ImageServiceModal.cs" />
     <Compile Include="ImageService\Server\ImageServer.cs" />
