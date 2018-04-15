@@ -7,3 +7,12 @@ C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService
 C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.exe
 C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.pdb
 C:\Users\Oved-LT\Documents\Visual Studio 2017\Projects\ImageService\ImageService\obj\Debug\ImageService.ProjectInstaller.resources
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\bin\Debug\ImageService.exe.config
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\bin\Debug\ImageService.exe
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\bin\Debug\ImageService.pdb
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\obj\Debug\ImageService.csprojResolveAssemblyReference.cache
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\obj\Debug\ImageService.ProjectInstaller.resources
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\obj\Debug\ImageService.Service1.resources
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\obj\Debug\ImageService.csproj.GenerateResource.Cache
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\obj\Debug\ImageService.exe
+C:\Users\Yaniv\Documents\GitHub\ImageService\ImageService\obj\Debug\ImageService.pdb

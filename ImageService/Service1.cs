@@ -29,12 +29,19 @@ namespace ImageService {
             var server = new ImageServer(outdir_path, logger, thumbSize);
 
             int numFolders = Int32.Parse(ConfigurationManager.AppSettings["NumFoldersToWatch"]);
-            for(int i = 1; i<= numFolders; i++)
-                server.watch_dir(ConfigurationManager.AppSettings["Handler_" + i]);
-            
+
+            //take handler as string of path and split it to paths (as strings) array
+            string phrase = ConfigurationManager.AppSettings["Handler"];
+            string[] dirPaths = phrase.Split(';');
+            for (int i = 0; i < numFolders; i++)
+            {
+                var a = dirPaths[i];
+                server.watch_dir(dirPaths[i]);
+            }
         }
 
         protected override void OnStop() {
+            //DictonaryXml.DictToXml()
         }
     }
 }
