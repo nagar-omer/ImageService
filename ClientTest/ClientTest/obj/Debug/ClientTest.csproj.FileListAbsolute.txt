@@ -1,0 +1,5 @@
+c:\users\yaniv\documents\visual studio 2017\Projects\ClientTest\ClientTest\bin\Debug\ClientTest.exe.config
+c:\users\yaniv\documents\visual studio 2017\Projects\ClientTest\ClientTest\bin\Debug\ClientTest.exe
+c:\users\yaniv\documents\visual studio 2017\Projects\ClientTest\ClientTest\bin\Debug\ClientTest.pdb
+c:\users\yaniv\documents\visual studio 2017\Projects\ClientTest\ClientTest\obj\Debug\ClientTest.exe
+c:\users\yaniv\documents\visual studio 2017\Projects\ClientTest\ClientTest\obj\Debug\ClientTest.pdb

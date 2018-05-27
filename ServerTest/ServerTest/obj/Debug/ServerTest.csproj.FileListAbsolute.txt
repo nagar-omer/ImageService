@@ -1,0 +1,6 @@
+C:\Users\Yaniv\Documents\Visual Studio 2017\Projects\ServerTest\ServerTest\bin\Debug\ServerTest.exe.config
+C:\Users\Yaniv\Documents\Visual Studio 2017\Projects\ServerTest\ServerTest\bin\Debug\ServerTest.exe
+C:\Users\Yaniv\Documents\Visual Studio 2017\Projects\ServerTest\ServerTest\bin\Debug\ServerTest.pdb
+C:\Users\Yaniv\Documents\Visual Studio 2017\Projects\ServerTest\ServerTest\obj\Debug\ServerTest.csprojResolveAssemblyReference.cache
+C:\Users\Yaniv\Documents\Visual Studio 2017\Projects\ServerTest\ServerTest\obj\Debug\ServerTest.exe
+C:\Users\Yaniv\Documents\Visual Studio 2017\Projects\ServerTest\ServerTest\obj\Debug\ServerTest.pdb
